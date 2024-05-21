@@ -1,3 +1,4 @@
+import Feed from "@/components/Feed";
 import Input from "@/components/Input";
 
 export default function Home() {
@@ -7,6 +8,7 @@ export default function Home() {
         <h1 className="text-lg sm:text-xl font-bold">Home</h1>
       </div>
       <Input />
+      <Feed />
     </div>
   );
 }
