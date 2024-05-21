@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 
 
 
-const Icons = ({id}) => {
+const Icons = ({id, uid}) => {
   const {data: session} = useSession()
   const db = getFirestore(app)
   const [isLiked, setIsLiked] = useState(false)
@@ -40,6 +40,22 @@ const Icons = ({id}) => {
     )
   }, [likes])
 
+  const deletePost = async () => {
+    if(window.confirm("Are you sure")){
+      if (session?.user?.uid === uid) {
+        deleteDoc(doc(db,'posts', id)).then(() => {
+          console.log("Deleted");
+          window.location.reload()
+        }).catch( error => {
+          console.error("ERROR: ", error)
+        })
+      } else {
+        alert("Ха-ха-ха,хотел удалить да? ты не авторизован, бомж, иди в мусор")
+      }
+    }
+  }
+
+
   return (
     <div className="flex justify-start gap-5 p-2 text-gray-500">
       <HiOutlineChat className="w-8 h-8 rounded-full cursor-pointer transition duration-500 ease-in-out p-2 hover:text-sky-500 hover:bg-sky-100"/>
@@ -55,7 +71,9 @@ const Icons = ({id}) => {
       )}
       {likes.length > 0 && <span className={`text-xs ${isLiked && 'text-red-600'}`}>{likes.length}</span>}
       </div>
-      <HiOutlineTrash className="w-8 h-8 rounded-full cursor-pointer transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100"/>
+      {session?.user?.uid === uid && (
+        <HiOutlineTrash onClick={deletePost} className="w-8 h-8 rounded-full cursor-pointer transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100"/>
+      )}
     </div>
   )
 }
