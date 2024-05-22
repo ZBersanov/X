@@ -1,3 +1,4 @@
+import Comments from "@/components/Comments"
 import Post from "@/components/Post"
 import { app } from "@/firebase"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
@@ -21,6 +22,7 @@ export default async function Posts({params}) {
         <h2 className="sm:text-lg">Back</h2>
       </div>
       <Post post={data} id={data.id} />
+      <Comments id={params.id}/>
     </div>
   )
 }
