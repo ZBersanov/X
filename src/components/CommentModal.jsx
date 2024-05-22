@@ -7,7 +7,9 @@ import { HiX } from "react-icons/hi"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { app } from "@/firebase"
-import { doc, getFirestore, onSnapshot } from "firebase/firestore"
+import {serverTimestamp, addDoc, collection, doc, getFirestore, onSnapshot } from "firebase/firestore"
+import { useRouter } from "next/navigation"
+
 
 const CommentModal = () => {
   const [open, setOpen] = useRecoilState(modalState)
@@ -16,6 +18,8 @@ const CommentModal = () => {
   const [post, setPost] = useState({})
   const [input, setInput] = useState('')
   const db = getFirestore(app)
+  const router = useRouter()
+  
 
   useEffect(() => {
     if (postId) {
@@ -34,9 +38,25 @@ const CommentModal = () => {
     }
   }, [postId])
 
-  const sendComment = async () => {}
+
+  const sendComment = async () => {
+    addDoc(collection(db, 'posts', postId, 'comments'), {
+      name: session.user.name,
+      username: session.user.username,
+      userImg: session.user.image,
+      comment: input,
+      timestamp: serverTimestamp()
+    }).then(() => {
+      setOpen(false)
+      setInput('')
+      router.push(`/posts/${postId}`)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   if (!session) return null
+  
 
   return (
     <div>

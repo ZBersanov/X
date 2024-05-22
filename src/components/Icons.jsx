@@ -15,6 +15,7 @@ const Icons = ({ id, uid }) => {
   const [likes, setLikes] = useState([])
   const [open, setOpen] = useRecoilState(modalState)
   const [postId, setPostId] = useRecoilState(postIdState)
+  const [comments, setComments] = useState([])
 
   const likePost = async () => {
     if (session) {
@@ -45,6 +46,16 @@ const Icons = ({ id, uid }) => {
     )
   }, [likes])
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, 'posts', id, 'comments'),
+      (snapshot) => {
+        setComments(snapshot.docs)
+      }
+    )
+    return () => unsubscribe()
+  }, [db, id])
+
   const deletePost = async () => {
     if (window.confirm("Are you sure")) {
       if (session?.user?.uid === uid) {
@@ -63,17 +74,22 @@ const Icons = ({ id, uid }) => {
 
   return (
     <div className="flex justify-start gap-5 p-2 text-gray-500">
-      <HiOutlineChat
-        onClick={() => {
-          if (!session) {
-            signIn()
-          } else {
-            setOpen(!open)
-            setPostId(id)
-            console.log('Modal opened')  // Add this line for debugging
-          }
-        }} className="w-8 h-8 rounded-full cursor-pointer transition duration-500 ease-in-out p-2 hover:text-sky-500 hover:bg-sky-100"
-      />
+      <div className="flex items-center">
+        <HiOutlineChat
+          onClick={() => {
+            if (!session) {
+              signIn()
+            } else {
+              setOpen(!open)
+              setPostId(id)
+              console.log('Modal opened')  // Add this line for debugging
+            }
+          }} className="w-8 h-8 rounded-full cursor-pointer transition duration-500 ease-in-out p-2 hover:text-sky-500 hover:bg-sky-100"
+        />
+        {
+          comments.length > 0 && <span className="text-xs">{comments.length}</span>
+        }
+      </div>
       <div className="flex items-center">
         {isLiked
           ? (
